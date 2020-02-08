@@ -1,6 +1,8 @@
 package com.usth.miaosha.service;
 
 import com.usth.miaosha.dao.GoodsDao;
+import com.usth.miaosha.domain.Goods;
+import com.usth.miaosha.domain.MiaoshaGoods;
 import com.usth.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,5 +21,11 @@ public class GoodsService {
 
     public GoodsVo getGoodsVoByGoodsId(long goodsId) {
         return goodsDao.getGoodsVoByGoodsId(goodsId);
+    }
+
+    public void reduceStock(GoodsVo goods) {
+        MiaoshaGoods g = new MiaoshaGoods();
+        g.setGoodsId(goods.getId());
+        goodsDao.reduceStock(g);
     }
 }

@@ -39,8 +39,6 @@ public class GoodsController {
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
         model.addAttribute("goods",goods);
 
-        System.out.println("start time = " + goods.getStartDate());
-        System.out.println("end time = " + goods.getEndDate());
         long startAt = goods.getStartDate().getTime();
         long endAt = goods.getEndDate().getTime();
         long now = System.currentTimeMillis();
