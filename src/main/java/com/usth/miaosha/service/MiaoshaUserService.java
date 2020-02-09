@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 @Service
 public class MiaoshaUserService {
@@ -42,7 +43,7 @@ public class MiaoshaUserService {
         return user;
     }
 
-    public boolean login(HttpServletResponse response,LoginVo loginVo) {
+    public String login(HttpServletResponse response,LoginVo loginVo) {
         if(loginVo == null) {
             throw new GlobalException(CodeMsg.SERVER_ERROR);
         }
@@ -61,7 +62,20 @@ public class MiaoshaUserService {
         //生成cookie
         String token = UUIDUtil.uuid();
         addCookie(response,token,user);
-        return true;
+        return token;
+    }
+
+    public void reg(){
+        for(int i=0;i<5000;i++) {
+            MiaoshaUser user = new MiaoshaUser();
+            user.setId(13000000000L+i);
+            user.setLoginCount(1);
+            user.setNickname("user"+i);
+            user.setRegisterDate(new Date());
+            user.setSalt("1a2b3c");
+            user.setPassword(MD5Util.inputPassToDBPass("123456", user.getSalt()));
+            miaoshaUserDao.insetrUser(user);
+        }
     }
 
     private void addCookie(HttpServletResponse response,String token,MiaoshaUser user) {

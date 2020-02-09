@@ -21,7 +21,7 @@ public class MD5UtilTest {
 
     @Test
     public void fromPassToDBPass() {
-        System.out.println(MD5Util.fromPassToDBPass("d3b1294a61a07da9b49b6e22b2cbd7f9",""));
+        System.out.println(MD5Util.fromPassToDBPass("d3b1294a61a07da9b49b6e22b2cbd7f9","112233"));
     }
 
     @Test
