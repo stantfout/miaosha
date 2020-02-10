@@ -42,4 +42,14 @@ public class GoodsVo extends Goods {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
+
+    @Override
+    public String toString() {
+        return "GoodsVo{" +
+                "miaoshaPrice=" + miaoshaPrice +
+                ", stockCount=" + stockCount +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                '}';
+    }
 }
