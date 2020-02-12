@@ -1,11 +1,13 @@
 package com.usth.miaosha.controller;
 
 import com.usth.miaosha.domain.User;
+import com.usth.miaosha.rabbitmq.MQSender;
 import com.usth.miaosha.redis.RedisService;
 import com.usth.miaosha.redis.UserKey;
 import com.usth.miaosha.result.CodeMsg;
 import com.usth.miaosha.result.Result;
 import com.usth.miaosha.service.UserService;
+import org.apache.ibatis.executor.ResultExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +23,9 @@ public class DemoController {
 
     @Autowired
     RedisService redisService;
+
+    @Autowired
+    MQSender sender;
 
     @RequestMapping("/")
     @ResponseBody
@@ -77,5 +82,33 @@ public class DemoController {
         user.setName("1900");
         redisService.set(UserKey.getById,"1",user);
         return Result.success(true);
+    }
+
+    @RequestMapping("/mq")
+    @ResponseBody
+    public Result<String> mq() {
+        sender.send("hello world");
+        return Result.success("hello world");
+    }
+
+    @RequestMapping("/mq/topic")
+    @ResponseBody
+    public Result<String> topic() {
+        sender.sendTopic("hello world");
+        return Result.success("hello world");
+    }
+
+    @RequestMapping("/mq/fanout")
+    @ResponseBody
+    public Result<String> fanout() {
+        sender.sendFanout("hello world");
+        return Result.success("hello world");
+    }
+
+    @RequestMapping("/mq/header")
+    @ResponseBody
+    public Result<String> header() {
+        sender.sendHeader("hello world");
+        return Result.success("hello world");
     }
 }
