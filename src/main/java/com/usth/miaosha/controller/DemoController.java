@@ -83,7 +83,7 @@ public class DemoController {
         redisService.set(UserKey.getById,"1",user);
         return Result.success(true);
     }
-
+    /*
     @RequestMapping("/mq")
     @ResponseBody
     public Result<String> mq() {
@@ -111,4 +111,5 @@ public class DemoController {
         sender.sendHeader("hello world");
         return Result.success("hello world");
     }
+    */
 }
