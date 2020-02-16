@@ -1,6 +1,7 @@
 package com.usth.miaosha.controller;
 
 import com.alibaba.druid.util.StringUtils;
+import com.usth.miaosha.access.AccessLimit;
 import com.usth.miaosha.domain.MiaoshaUser;
 import com.usth.miaosha.redis.GoodsKey;
 import com.usth.miaosha.redis.RedisService;
@@ -66,89 +67,30 @@ public class GoodsController {
         return html;
     }
 
-    @RequestMapping(value = "/to_detail/{goodsId}",produces = "text/html")
-    @ResponseBody
-    public String toDetail(HttpServletRequest request,
-                           HttpServletResponse response,
-                           Model model, MiaoshaUser user,
-                           @PathVariable Long goodsId) {
-        model.addAttribute("user",user);
-
-        //取缓存
-        String html = redisService.get(GoodsKey.getGoodsDetail, ""+goodsId, String.class);
-        if(!StringUtils.isEmpty(html)) {
-            return html;
-        }
-
-        //查询商品详细信息
-        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
-        model.addAttribute("goods",goods);
-
-        long startAt = goods.getStartDate().getTime();
-        long endAt = goods.getEndDate().getTime();
-        long now = System.currentTimeMillis();
-
-        int miaoshaStatus;
-        /*
-         * 剩余开始时间
-         */
-        int remainSeconds;
-
-        if(now < startAt) {//秒杀未开始，倒计时
-            miaoshaStatus = 0;
-            remainSeconds = (int)(startAt - now) / 1000;
-        } else if(now > endAt) {//秒杀结束
-            miaoshaStatus = 2;
-            remainSeconds = -1;
-        } else {//秒杀进行中
-            miaoshaStatus = 1;
-            remainSeconds = 0;
-        }
-        model.addAttribute("miaoshaStatus",miaoshaStatus);
-        model.addAttribute("remainSeconds",remainSeconds);
-
-        //手动渲染
-        SpringWebContext context = new SpringWebContext(request,response,request.getServletContext(),
-                request.getLocale(),model.asMap(),applicationContext);
-        html = thymeleafViewResolver.getTemplateEngine().process("goods_detail",context);
-        if(!StringUtils.isEmpty(html)) {
-            redisService.set(GoodsKey.getGoodsDetail,""+goodsId,html);
-        }
-        return html;
-    }
-
+    @AccessLimit(seconds = 0,maxCount = -1,needLogin = true)
     @RequestMapping(value="/detail/{goodsId}")
     @ResponseBody
-    public Result<GoodsDetailVo> detail(HttpServletRequest request,
-                                           HttpServletResponse response,
-                                           Model model, MiaoshaUser user,
-                                           @PathVariable Long goodsId) {
+    public Result<GoodsDetailVo> detail(MiaoshaUser user,
+                                        @PathVariable Long goodsId) {
         //查询商品详细信息
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
         long startAt = goods.getStartDate().getTime();
         long endAt = goods.getEndDate().getTime();
         long now = System.currentTimeMillis();
 
-        int miaoshaStatus;
-        /*
-         * 剩余开始时间
-         */
+        //剩余开始时间,通过剩余开始时间判断秒杀状态
         int remainSeconds;
 
         if(now < startAt) {//秒杀未开始，倒计时
-            miaoshaStatus = 0;
             remainSeconds = (int)(startAt - now) / 1000;
         } else if(now > endAt) {//秒杀结束
-            miaoshaStatus = 2;
             remainSeconds = -1;
         } else {//秒杀进行中
-            miaoshaStatus = 1;
             remainSeconds = 0;
         }
         GoodsDetailVo vo = new GoodsDetailVo();
         vo.setGoods(goods);
         vo.setUser(user);
-        vo.setMiaoshaStatus(miaoshaStatus);
         vo.setRemainSeconds(remainSeconds);
         return Result.success(vo);
     }

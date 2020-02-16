@@ -1,5 +1,6 @@
 package com.usth.miaosha.controller;
 
+import com.usth.miaosha.access.AccessLimit;
 import com.usth.miaosha.domain.MiaoshaUser;
 import com.usth.miaosha.domain.OrderInfo;
 import com.usth.miaosha.result.CodeMsg;
@@ -25,13 +26,11 @@ public class OrderController {
     @Autowired
     GoodsService goodsService;
 
+    @AccessLimit(seconds = 0,maxCount = -1)
     @RequestMapping(value = "/detail")
     @ResponseBody
-    public Result<OrderDetailVo> detail(Model model, MiaoshaUser user,
+    public Result<OrderDetailVo> detail(MiaoshaUser user,
                                       @RequestParam("orderId") long orderId) {
-        if(user == null) {
-            return Result.error(CodeMsg.SESSION_ERROR);
-        }
         OrderInfo order = orderService.getOrderById(orderId);
         if(order == null) {
             return Result.error(CodeMsg.ORDER_NOT_EXIST);
