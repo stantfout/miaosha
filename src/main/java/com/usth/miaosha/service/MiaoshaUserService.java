@@ -48,6 +48,7 @@ public class MiaoshaUserService {
         if(user == null) {
             throw new GlobalException(CodeMsg.MOBILE_NOT_EXIST);
         }
+        //https://blog.csdn.net/tTU1EvLDeLFq5btqik/article/details/78693323
         //更新数据库
         MiaoshaUser updateUser = new MiaoshaUser();
         updateUser.setId(id);

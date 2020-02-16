@@ -19,7 +19,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
@@ -76,7 +75,7 @@ public class MiaoshaController implements InitializingBean {
      **/
     @RequestMapping(value = "/{path}/do_miaosha",method = RequestMethod.POST)
     @ResponseBody
-    public Result<Integer> list(MiaoshaUser user,
+    public Result<Integer> miaosha(MiaoshaUser user,
                                 @RequestParam("goodsId") long goodsId,
                                 @PathVariable String path) {
         //验证path
@@ -96,7 +95,7 @@ public class MiaoshaController implements InitializingBean {
         }
         //预减库存
         Long stock = redisService.decr(GoodsKey.getMiaoshaGoodsStock, "" + goodsId);
-        if(stock <= 0) {
+        if(stock < 0) {
             localOverMap.put(goodsId,true);
             return Result.error(CodeMsg.MIAOSHA_OVER);
         }
@@ -119,8 +118,7 @@ public class MiaoshaController implements InitializingBean {
     @AccessLimit(seconds = 5,maxCount = 5,needLogin = true)
     @RequestMapping(value = "/path",method = RequestMethod.GET)
     @ResponseBody
-    public Result<String> getMiaoshaPath(HttpServletRequest request,
-                                         MiaoshaUser user,
+    public Result<String> getMiaoshaPath(MiaoshaUser user,
                                          @RequestParam("goodsId") long goodsId,
                                          @RequestParam("verifyCode") int verifyCode) {
         //验证码检测

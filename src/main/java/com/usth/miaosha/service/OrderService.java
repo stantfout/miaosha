@@ -6,6 +6,8 @@ import com.usth.miaosha.domain.MiaoshaUser;
 import com.usth.miaosha.domain.OrderInfo;
 import com.usth.miaosha.redis.OrderKey;
 import com.usth.miaosha.redis.RedisService;
+import com.usth.miaosha.util.MD5Util;
+import com.usth.miaosha.util.UUIDUtil;
 import com.usth.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,7 @@ public class OrderService {
         orderInfo.setCreateDate(new Date());
         orderInfo.setGoodsPrice(goods.getMiaoshaPrice());
         orderInfo.setOrderChannel(1);
-        orderInfo.setStatus(0);
+        orderInfo.setOrderStatus(0);
         orderDao.insertOrder(orderInfo);
         MiaoshaOrder miaoshaOrder = new MiaoshaOrder();
         miaoshaOrder.setGoodsId(goods.getId());
@@ -51,5 +53,29 @@ public class OrderService {
 
     public OrderInfo getOrderById(long orderId) {
         return orderDao.getOrderById(orderId);
+    }
+
+    public String createOrderPayPath(MiaoshaUser user, long goodsId) {
+        if(user == null || goodsId <= 0) {
+            return null;
+        }
+        String str = MD5Util.md5(UUIDUtil.uuid() + "123456");
+        redisService.set(OrderKey.getOrderPath,"" + user.getId() + "_" + goodsId, str);
+        return str;
+    }
+
+    public boolean checkPath(MiaoshaUser user, long goodsId, String path) {
+        if(user == null || path == null) {
+            return false;
+        }
+        String pathOld = redisService.get(OrderKey.getOrderPath,"" + user.getId() + "_" + goodsId, String.class);
+        return path.equals(pathOld);
+    }
+
+    public long payOrder(MiaoshaUser user, long goodsId,long orderId) {
+        orderDao.deleteMiaoshaOrder(user.getId(),goodsId);
+        orderDao.deleteOrder(user.getId(),orderId);
+        redisService.set(OrderKey.deleteOrder,"" + user.getId() + "_" + goodsId,goodsId);
+        return 1;
     }
 }

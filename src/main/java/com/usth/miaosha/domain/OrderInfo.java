@@ -12,7 +12,7 @@ public class OrderInfo {
     private Double goodsPrice;
     private Integer orderChannel;
     //订单状态: 0新建未支付,1已支付,2已发货,3已收货,4已退款,5已完成
-    private Integer status;
+    private Integer orderStatus;
     private Date createDate;
     private Date payDate;
 
@@ -80,12 +80,12 @@ public class OrderInfo {
         this.orderChannel = orderChannel;
     }
 
-    public Integer getStatus() {
-        return status;
+    public Integer getOrderStatus() {
+        return orderStatus;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setOrderStatus(Integer status) {
+        this.orderStatus = status;
     }
 
     public Date getCreateDate() {
