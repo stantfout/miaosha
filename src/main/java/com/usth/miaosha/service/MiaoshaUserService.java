@@ -3,6 +3,7 @@ package com.usth.miaosha.service;
 import com.alibaba.druid.util.StringUtils;
 import com.usth.miaosha.dao.MiaoshaUserDao;
 import com.usth.miaosha.domain.MiaoshaUser;
+import com.usth.miaosha.domain.User;
 import com.usth.miaosha.exception.GlobalException;
 import com.usth.miaosha.redis.MiaoshaUserKey;
 import com.usth.miaosha.redis.RedisService;
@@ -94,6 +95,27 @@ public class MiaoshaUserService {
         return token;
     }
 
+    public String reg(HttpServletResponse response, LoginVo loginVo){
+        if(loginVo == null) {
+            throw new GlobalException(CodeMsg.SERVER_ERROR);
+        }
+        MiaoshaUser user = getById(Long.parseLong(loginVo.getMobile()));
+        if (user != null) {
+            throw new GlobalException(CodeMsg.REG_ERROR);
+        }
+        user = new MiaoshaUser();
+        user.setId(Long.valueOf(loginVo.getMobile()));
+        user.setLoginCount(1);
+        user.setNickname("user");
+        user.setRegisterDate(new Date());
+        user.setSalt(UUIDUtil.uuid());
+        user.setPassword(MD5Util.inputPassToDBPass(loginVo.getPassword(), user.getSalt()));
+        miaoshaUserDao.insertUser(user);
+        String token = UUIDUtil.uuid();
+        addCookie(response,token,user);
+        return token;
+    }
+
     public void reg(){
         for(int i=0;i<5000;i++) {
             MiaoshaUser user = new MiaoshaUser();
@@ -103,7 +125,7 @@ public class MiaoshaUserService {
             user.setRegisterDate(new Date());
             user.setSalt("1a2b3c");
             user.setPassword(MD5Util.inputPassToDBPass("123456", user.getSalt()));
-            miaoshaUserDao.insetrUser(user);
+            miaoshaUserDao.insertUser(user);
         }
     }
 

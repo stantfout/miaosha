@@ -13,7 +13,7 @@ public interface MiaoshaUserDao {
     MiaoshaUser getById(long id);
 
     @Insert("insert into miaosha_user(login_count, nickname, register_date, salt, password, id)values(#{loginCount},#{nickname},#{registerDate},#{salt},#{password},#{id})")
-    int insetrUser(MiaoshaUser user);
+    int insertUser(MiaoshaUser user);
 
     @Update("update miaosha_user set password = #{password} where id = #{id}")
     void updatePassword(MiaoshaUser updateUser);

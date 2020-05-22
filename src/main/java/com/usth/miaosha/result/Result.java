@@ -9,7 +9,7 @@ public class Result<T> {
      * 成功时候的调用
      * */
     public static <T> Result<T> success(T data){
-        return new  Result<T>(data);
+        return new Result<>(data);
     }
 
     /**

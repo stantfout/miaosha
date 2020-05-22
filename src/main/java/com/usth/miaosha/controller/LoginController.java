@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/login")
 public class LoginController {
 
     @Autowired
@@ -22,12 +21,17 @@ public class LoginController {
 
     private static Logger log = LoggerFactory.getLogger(LoginController.class);
 
-    @RequestMapping("/to_login")
+    @RequestMapping("/")
+    public String init() {
+        return "login";
+    }
+
+    @RequestMapping("/login/to_login")
     public String toLogin() {
         return "login";
     }
 
-    @RequestMapping("/do_login")
+    @RequestMapping("/login/do_login")
     @ResponseBody
     public Result<String> doLogin(HttpServletResponse response, @Valid LoginVo loginVo) {
         log.info(loginVo.toString());
@@ -35,5 +39,12 @@ public class LoginController {
         return Result.success(token);
     }
 
+    @RequestMapping("/login/do_reg")
+    @ResponseBody
+    public Result<String> doReg(HttpServletResponse response,@Valid LoginVo loginVo) {
+        log.info(loginVo.toString());
+        String token = userService.reg(response,loginVo);
+        return Result.success(token);
+    }
 
 }
